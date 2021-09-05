@@ -10,9 +10,17 @@ class Sitemap
     /** @var array */
     protected $tags = [];
 
-    public static function create(): self
+    protected $imageSitemap = false;
+
+    public static function create(bool $imageSitemap = false): self
     {
         return new static();
+    }
+
+    public function imageSitemap(): self
+    {
+        $this->imageSitemap = true;
+        return $this;
     }
 
     /**
@@ -55,9 +63,10 @@ class Sitemap
         sort($this->tags);
 
         $tags = $this->tags;
+        $imageSitemap = $this->imageSitemap;
 
         return view('laravel-sitemap::sitemap')
-            ->with(compact('tags'))
+            ->with(compact('tags', 'imageSitemap'))
             ->render();
     }
 
