@@ -25,6 +25,7 @@ class Sitemap implements Responsable, Renderable
     public function imageSitemap(): self
     {
         $this->imageSitemap = true;
+
         return $this;
     }
 
