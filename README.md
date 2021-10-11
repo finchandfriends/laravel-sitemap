@@ -2,9 +2,8 @@
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/spatie/laravel-sitemap.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-sitemap)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
-[![Build Status](https://img.shields.io/travis/spatie/laravel-sitemap/master.svg?style=flat-square)](https://travis-ci.org/spatie/laravel-sitemap)
-[![Quality Score](https://img.shields.io/scrutinizer/g/spatie/laravel-sitemap.svg?style=flat-square)](https://scrutinizer-ci.com/g/spatie/laravel-sitemap)
-[![StyleCI](https://styleci.io/repos/65549848/shield)](https://styleci.io/repos/65549848)
+![Test Status](https://img.shields.io/github/workflow/status/spatie/laravel-sitemap/run-tests?label=tests)
+![Code Style Status](https://img.shields.io/github/workflow/status/spatie/laravel-sitemap/Check%20&%20fix%20styling?label=code%20style)
 [![Total Downloads](https://img.shields.io/packagist/dt/spatie/laravel-sitemap.svg?style=flat-square)](https://packagist.org/packages/spatie/laravel-sitemap)
 
 This package can generate a sitemap without you having to add urls to it manually. This works by crawling your entire site.
@@ -60,6 +59,45 @@ SitemapGenerator::create('https://example.com')
 
 The generator has [the ability to execute JavaScript](https://github.com/spatie/laravel-sitemap#executing-javascript) on each page so links injected into the dom by JavaScript will be crawled as well.
 
+You can also use one of your available filesystem disks to write the sitemap to.
+```php
+SitemapGenerator::create('https://example.com')->getSitemap()->writeToDisk('public', 'sitemap.xml');
+```
+
+You can also add your models directly by implementing the `\Spatie\Sitemap\Contracts\Sitemapable` interface.
+
+```php
+use Spatie\Sitemap\Contracts\Sitemapable;
+use Spatie\Sitemap\Tags\Url;
+
+class Post extends Model implements Sitemapable
+{
+    public function toSitemapTag(): Url | string | array
+    {
+        return route('blog.post.show', $this);
+    }
+}
+```
+
+Now you can add a single post model to the sitemap or even a whole collection.
+```php
+use Spatie\Sitemap\Sitemap;
+
+Sitemap::create()
+    ->add($post)
+    ->add(Post::all());
+```
+
+This way you can add all your pages super fast without the need to crawl them all.
+
+## Support us
+
+[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-sitemap.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-sitemap)
+
+We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+
+We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+
 ## Installation
 
 First, install the package via composer:
@@ -71,7 +109,6 @@ composer require spatie/laravel-sitemap
 The package will automatically register itself.
 
 If you want to update your sitemap automatically and frequently you need to perform [some extra steps](https://github.com/spatie/laravel-sitemap#generating-the-sitemap-frequently).
-
 
 ## Configuration
 
@@ -85,6 +122,7 @@ This will copy the default config to `config/sitemap.php` where you can edit it.
 
 ```php
 use GuzzleHttp\RequestOptions;
+use Spatie\Sitemap\Crawler\Profile;
 
 return [
 
@@ -177,10 +215,10 @@ The generated sitemap will look similar to this:
 
 #### Define a custom Crawl Profile
 
-You can create a custom crawl profile by implementing the `Spatie\Crawler\CrawlProfile` interface and by customizing the `shouldCrawl()` method for full control over what url/domain/sub-domain should be crawled:
+You can create a custom crawl profile by implementing the `Spatie\Crawler\CrawlProfiles\CrawlProfile` interface and by customizing the `shouldCrawl()` method for full control over what url/domain/sub-domain should be crawled:
 
 ```php
-use Spatie\Crawler\CrawlProfile;
+use Spatie\Crawler\CrawlProfiles\CrawlProfile;
 use Psr\Http\Message\UriInterface;
 
 class CustomCrawlProfile extends CrawlProfile
@@ -265,7 +303,7 @@ SitemapGenerator::create('https://example.com')
        // Links present on the contact page won't be added to the
        // sitemap unless they are present on a crawlable page.
        
-       return strpos($url->getPath(), '/contact') !== false;
+       return strpos($url->getPath(), '/contact') === false;
    })
    ->writeToFile($sitemapPath);
 ```
@@ -304,7 +342,6 @@ The sitemap generator can execute JavaScript on each page so it will discover li
 Under the hood, [headless Chrome](https://github.com/spatie/browsershot) is used to execute JavaScript. Here are some pointers on [how to install it on your system](https://github.com/spatie/browsershot#requirements).
 
 The package will make an educated guess as to where Chrome is installed on your system. You can also manually pass the location of the Chrome binary to  `executeJavaScript()`.
-
 
 #### Manually adding links
 
@@ -394,19 +431,17 @@ the generated sitemap index will look similar to this:
 
 ### Create a sitemap index with sub-sequent sitemaps
 
-You can call the `maximumTagsPerSitemap` method to generate a
+You can call the `maxTagsPerSitemap` method to generate a
 sitemap that only contains the given amount of tags
 
 ```php
 use Spatie\Sitemap\SitemapGenerator;
 
 SitemapGenerator::create('https://example.com')
-    ->maximumTagsPerSitemap(20000)
+    ->maxTagsPerSitemap(20000)
     ->writeToFile(public_path('sitemap.xml'));
 
 ```
-
-
 
 ## Generating the sitemap frequently
 
@@ -488,14 +523,6 @@ Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
 ## Security
 
 If you discover any security related issues, please email freek@spatie.be instead of using the issue tracker.
-
-## Postcardware
-
-You're free to use this package, but if it makes it to your production environment we highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using.
-
-Our address is: Spatie, Samberstraat 69D, 2060 Antwerp, Belgium.
-
-We publish all received postcards [on our company website](https://spatie.be/en/opensource/postcards).
 
 ## Credits
 

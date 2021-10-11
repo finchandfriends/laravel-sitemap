@@ -2,15 +2,17 @@
 
 namespace Spatie\Sitemap\Test;
 
+use Illuminate\Support\Facades\Storage;
 use Spatie\Sitemap\SitemapIndex;
 use Spatie\Sitemap\Tags\Sitemap;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SitemapIndexTest extends TestCase
 {
-    /** @var \Spatie\Sitemap\SitemapIndex */
-    protected $index;
+    protected SitemapIndex $index;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -39,6 +41,15 @@ class SitemapIndexTest extends TestCase
         $this->index->writeToFile($path);
 
         $this->assertMatchesXmlSnapshot(file_get_contents($path));
+    }
+
+    /** @test */
+    public function it_can_write_a_sitemap_to_a_storage_disk()
+    {
+        Storage::fake('sitemap');
+        $this->index->writeToDisk('sitemap', 'sitemap.xml');
+
+        $this->assertMatchesXmlSnapshot(Storage::disk('sitemap')->get('sitemap.xml'));
     }
 
     /** @test */
@@ -71,7 +82,8 @@ class SitemapIndexTest extends TestCase
     public function it_can_render_a_sitemaps_with_all_its_set_properties()
     {
         $this->index
-            ->add(Sitemap::create('/sitemap1.xml')
+            ->add(
+                Sitemap::create('/sitemap1.xml')
                 ->setLastModificationDate($this->now->subDay())
             );
 
@@ -111,5 +123,13 @@ class SitemapIndexTest extends TestCase
         $this->assertNotNull($this->index->getSitemap('/sitemap1.xml'));
 
         $this->assertNull($this->index->getSitemap('/sitemap2.xml'));
+    }
+
+    /** @test */
+    public function an_instance_can_return_a_response()
+    {
+        $this->index->add('/sitemap1.xml');
+
+        $this->assertInstanceOf(Response::class, $this->index->toResponse(new Request));
     }
 }

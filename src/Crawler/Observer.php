@@ -2,10 +2,10 @@
 
 namespace Spatie\Sitemap\Crawler;
 
-use Spatie\Crawler\CrawlObserver;
-use Psr\Http\Message\UriInterface;
-use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\UriInterface;
+use Spatie\Crawler\CrawlObservers\CrawlObserver;
 
 class Observer extends CrawlObserver
 {
@@ -22,14 +22,14 @@ class Observer extends CrawlObserver
      *
      * @param \Psr\Http\Message\UriInterface $url
      */
-    public function willCrawl(UriInterface $url)
+    public function willCrawl(UriInterface $url): void
     {
     }
 
     /**
      * Called when the crawl has ended.
      */
-    public function finishedCrawling()
+    public function finishedCrawling(): void
     {
     }
 
@@ -44,7 +44,7 @@ class Observer extends CrawlObserver
         UriInterface $url,
         ResponseInterface $response,
         ?UriInterface $foundOnUrl = null
-    ) {
+    ): void {
         ($this->hasCrawled)($url, $response);
     }
 
@@ -59,6 +59,6 @@ class Observer extends CrawlObserver
         UriInterface $url,
         RequestException $requestException,
         ?UriInterface $foundOnUrl = null
-    ) {
+    ): void {
     }
 }

@@ -2,15 +2,18 @@
 
 namespace Spatie\Sitemap\Test;
 
+use Illuminate\Support\Facades\Storage;
+use Spatie\Sitemap\Contracts\Sitemapable;
 use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\Tags\Url;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 class SitemapTest extends TestCase
 {
-    /** @var \Spatie\Sitemap\Sitemap */
-    protected $sitemap;
+    protected Sitemap $sitemap;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -39,6 +42,15 @@ class SitemapTest extends TestCase
         $this->sitemap->writeToFile($path);
 
         $this->assertMatchesXmlSnapshot(file_get_contents($path));
+    }
+
+    /** @test */
+    public function it_can_write_a_sitemap_to_a_storage_disk()
+    {
+        Storage::fake('sitemap');
+        $this->sitemap->writeToDisk('sitemap', 'sitemap.xml');
+
+        $this->assertMatchesXmlSnapshot(Storage::disk('sitemap')->get('sitemap.xml'));
     }
 
     /** @test */
@@ -92,7 +104,8 @@ class SitemapTest extends TestCase
     public function it_can_render_an_url_with_all_its_set_properties()
     {
         $this->sitemap
-            ->add(Url::create('/home')
+            ->add(
+                Url::create('/home')
                 ->setLastModificationDate($this->now->subDay())
                 ->setChangeFrequency(Url::CHANGE_FREQUENCY_YEARLY)
                 ->setPriority(0.1)
@@ -134,5 +147,90 @@ class SitemapTest extends TestCase
         $this->assertNotNull($this->sitemap->getUrl('/page1'));
 
         $this->assertNull($this->sitemap->getUrl('/page2'));
+    }
+
+    /** @test */
+    public function a_url_object_can_not_be_added_twice_to_the_sitemap()
+    {
+        $this->sitemap->add(Url::create('/home'));
+        $this->sitemap->add(Url::create('/home'));
+
+        $this->assertMatchesXmlSnapshot($this->sitemap->render());
+    }
+
+    /** @test */
+    public function an_instance_can_return_a_response()
+    {
+        $this->sitemap->add(Url::create('/home'));
+
+        $this->assertInstanceOf(Response::class, $this->sitemap->toResponse(new Request));
+    }
+
+    /** @test */
+    public function multiple_urls_can_be_added_in_one_call()
+    {
+        $this->sitemap->add([
+            Url::create('/'),
+            '/home',
+            Url::create('/home'), // filtered
+        ]);
+
+        $this->assertMatchesXmlSnapshot($this->sitemap->render());
+    }
+
+    /** @test */
+    public function sitemapable_object_can_be_added()
+    {
+        $this->sitemap
+            ->add(new class implements Sitemapable {
+                public function toSitemapTag(): Url | string | array
+                {
+                    return '/';
+                }
+            })
+            ->add(new class implements Sitemapable {
+                public function toSitemapTag(): Url | string | array
+                {
+                    return Url::create('/home');
+                }
+            })
+            ->add(new class implements Sitemapable {
+                public function toSitemapTag(): Url | string | array
+                {
+                    return [
+                        'blog/post-1',
+                        Url::create('/blog/post-2'),
+                    ];
+                }
+            });
+
+        $this->assertMatchesXmlSnapshot($this->sitemap->render());
+    }
+
+    /** @test */
+    public function sitemapable_objects_can_be_added()
+    {
+        $this->sitemap->add(collect([
+            new class implements Sitemapable {
+                public function toSitemapTag(): Url | string | array
+                {
+                    return 'blog/post-1';
+                }
+            },
+            new class implements Sitemapable {
+                public function toSitemapTag(): Url | string | array
+                {
+                    return 'blog/post-2';
+                }
+            },
+            new class implements Sitemapable {
+                public function toSitemapTag(): Url | string | array
+                {
+                    return 'blog/post-3';
+                }
+            },
+        ]));
+
+        $this->assertMatchesXmlSnapshot($this->sitemap->render());
     }
 }

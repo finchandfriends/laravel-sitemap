@@ -3,20 +3,20 @@
 namespace Spatie\Sitemap\Test;
 
 use Spatie\Crawler\Crawler;
-use Spatie\Sitemap\Sitemap;
-use Spatie\Crawler\CrawlSubdomains;
+use Spatie\Crawler\CrawlProfiles\CrawlInternalUrls;
+use Spatie\Crawler\CrawlProfiles\CrawlSubdomains;
 use Spatie\Sitemap\Crawler\Profile;
+use Spatie\Sitemap\Sitemap;
 use Spatie\Sitemap\SitemapGenerator;
-use Spatie\Crawler\CrawlInternalUrls;
 
 class CrawlProfileTest extends TestCase
 {
     /**
      * @var Crawler
      */
-    private $crawler;
+    protected $crawler;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ class CrawlProfileTest extends TestCase
 
         $sitemapGenerator = new SitemapGenerator($this->crawler);
 
-        $sitemap = $sitemapGenerator->getSitemap();
+        $sitemap = $sitemapGenerator->setUrl('')->getSitemap();
 
         $this->assertInstanceOf(Sitemap::class, $sitemap);
     }
@@ -53,7 +53,7 @@ class CrawlProfileTest extends TestCase
 
         $sitemapGenerator = new SitemapGenerator($this->crawler);
 
-        $sitemap = $sitemapGenerator->getSitemap();
+        $sitemap = $sitemapGenerator->setUrl('')->getSitemap();
 
         $this->assertInstanceOf(Sitemap::class, $sitemap);
     }
@@ -70,7 +70,7 @@ class CrawlProfileTest extends TestCase
 
         $sitemapGenerator = new SitemapGenerator($this->crawler);
 
-        $sitemap = $sitemapGenerator->getSitemap();
+        $sitemap = $sitemapGenerator->setUrl('')->getSitemap();
 
         $this->assertInstanceOf(Sitemap::class, $sitemap);
     }
@@ -87,7 +87,7 @@ class CrawlProfileTest extends TestCase
 
         $sitemapGenerator = new SitemapGenerator($this->crawler);
 
-        $sitemap = $sitemapGenerator->getSitemap();
+        $sitemap = $sitemapGenerator->setUrl('')->getSitemap();
 
         $this->assertInstanceOf(Sitemap::class, $sitemap);
     }

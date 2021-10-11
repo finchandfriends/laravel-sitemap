@@ -3,22 +3,20 @@
 namespace Spatie\Sitemap\Test;
 
 use Carbon\Carbon;
-use Spatie\Snapshots\MatchesSnapshots;
-use Spatie\Sitemap\SitemapServiceProvider;
-use Spatie\TemporaryDirectory\TemporaryDirectory;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Spatie\Sitemap\SitemapServiceProvider;
+use Spatie\Snapshots\MatchesSnapshots;
+use Spatie\TemporaryDirectory\TemporaryDirectory;
 
 abstract class TestCase extends OrchestraTestCase
 {
     use MatchesSnapshots;
 
-    /** @var \Carbon\Carbon */
-    protected $now;
+    protected Carbon $now;
 
-    /** @var \Spatie\TemporaryDirectory\TemporaryDirectory */
-    protected $temporaryDirectory;
+    protected TemporaryDirectory $temporaryDirectory;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -29,11 +27,6 @@ abstract class TestCase extends OrchestraTestCase
         $this->temporaryDirectory = (new TemporaryDirectory())->force()->create();
     }
 
-    /**
-     * @param \Illuminate\Foundation\Application $app
-     *
-     * @return array
-     */
     protected function getPackageProviders($app)
     {
         return [
