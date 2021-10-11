@@ -2,18 +2,17 @@
 
 namespace Spatie\Sitemap\Test;
 
-use Throwable;
-use Spatie\Crawler\Crawler;
-use Spatie\Sitemap\Tags\Url;
 use Psr\Http\Message\UriInterface;
+use Spatie\Crawler\Crawler;
 use Spatie\Sitemap\SitemapGenerator;
+use Spatie\Sitemap\Tags\Url;
+use Throwable;
 
 class SitemapGeneratorTest extends TestCase
 {
-    /** @var \Spatie\Sitemap\SitemapGenerator */
-    protected $sitemapGenerator;
+    protected SitemapGenerator $sitemapGenerator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->checkIfTestServerIsRunning();
 
@@ -47,10 +46,10 @@ class SitemapGeneratorTest extends TestCase
             $subsitemap = file_get_contents($this->temporaryDirectory->path($filename));
 
             $this->assertNotEmpty($subsitemap);
-            $this->assertContains("test_chunk_{$index}.xml", $content);
-            $this->assertContains('<loc>', $subsitemap);
-            $this->assertContains('<url>', $subsitemap);
-            $this->assertContains('<urlset', $subsitemap);
+            $this->assertStringContainsString("test_chunk_{$index}.xml", $content);
+            $this->assertStringContainsString('<loc>', $subsitemap);
+            $this->assertStringContainsString('<url>', $subsitemap);
+            $this->assertStringContainsString('<urlset', $subsitemap);
         }
     }
 
@@ -112,7 +111,7 @@ class SitemapGeneratorTest extends TestCase
         SitemapGenerator::create('http://localhost:4020')
             ->writeToFile($sitemapPath);
 
-        $this->assertNotContains('/not-allowed', file_get_contents($sitemapPath));
+        $this->assertStringNotContainsString('/not-allowed', file_get_contents($sitemapPath));
     }
 
     /** @test */
@@ -126,7 +125,7 @@ class SitemapGeneratorTest extends TestCase
             })
             ->writeToFile($sitemapPath);
 
-        $this->assertContains('/not-allowed', file_get_contents($sitemapPath));
+        $this->assertStringContainsString('/not-allowed', file_get_contents($sitemapPath));
     }
 
     /** @test */

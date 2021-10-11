@@ -3,15 +3,14 @@
 namespace Spatie\Sitemap\Test;
 
 use Carbon\Carbon;
-use Spatie\Sitemap\Tags\Url;
 use Spatie\Sitemap\Tags\Alternate;
+use Spatie\Sitemap\Tags\Url;
 
 class UrlTest extends TestCase
 {
-    /** @var \Spatie\Sitemap\Tags\Url */
-    protected $url;
+    protected Url $url;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -61,6 +60,18 @@ class UrlTest extends TestCase
         $this->url->setPriority(0.1);
 
         $this->assertEquals(0.1, $this->url->priority);
+    }
+
+    /** @test */
+    public function priority_is_clamped()
+    {
+        $this->url->setPriority(-0.1);
+
+        $this->assertEquals(0, $this->url->priority);
+
+        $this->url->setPriority(1.1);
+
+        $this->assertEquals(1, $this->url->priority);
     }
 
     public function change_frequency_can_be_set()

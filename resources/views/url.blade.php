@@ -1,6 +1,5 @@
 <url>
     @if (! empty($tag->url))
-
     <loc>{{ url($tag->url) }}</loc>
     @endif
 @if (count($tag->alternates))
@@ -15,6 +14,6 @@
     <changefreq>{{ $tag->changeFrequency }}</changefreq>
     @endif
 @if (! empty($tag->priority))
-    <priority>{{ $tag->priority }}</priority>
+    <priority>{{ number_format($tag->priority,1) }}</priority>
     @endif
 </url>

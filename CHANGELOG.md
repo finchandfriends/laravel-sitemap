@@ -2,6 +2,96 @@
 
 All notable changes to `laravel-sitemap` will be documented in this file
 
+## 6.0.5 - 2021-08-11
+
+- fix crawler integration (#407)
+
+## 6.0.4 - 2021-05-27
+
+- compatible with the spatie/crawler v7 contracts
+
+## 6.0.3 - 2021-05-26
+
+- allow spatie/crawler v7
+
+## 6.0.2 - 2021-04-09
+
+- bump temporary-directory to version 2.0 (#379)
+
+## 6.0.1 - 2021-03-26
+
+- do not sort links by default
+
+## 6.0.0 - 2021-03-12
+
+- add `Sitemapable`
+- drop support for PHP 7
+
+## 5.9.2 - 2021-03-04
+
+- allow crawler v6 (#365)
+
+## 5.9.1 - 2020-12-30
+
+- add `filter()` method to tags before rendering (#347)
+
+## 5.9.0 - 2020-12-27
+
+- add support for PHP 8
+
+## 5.8.0 - 2020-09-08
+
+- add support for Laravel 8
+
+## 5.7.0 - 2020-03-03
+
+- add support for Laravel 7
+
+## 5.6.0 - 2019-01-20
+
+- add `writeToDisk` (#283)
+
+## 5.5.0 - 2019-09-24
+
+- implement `Responsable` contract
+
+## 5.4.0 - 2019-09-04
+
+- make compatible with Laravel 6
+
+## 5.3.1 - 2019-09-02
+
+- make sure the sitemap cannot contain duplicate URLs
+
+## 5.3.0 - 2019-02-27
+
+- drop support for Laravel 5.7 and below
+- drop support for PHP 7.1 and below
+
+## 5.2.11 - 2019-02-27
+
+- add support for Laravel 5.8
+
+## 5.2.10 - 2019-02-15
+
+- fix some formatting issues
+
+## 5.2.9 - 2019-02-10
+
+- fix headers
+
+## 5.2.8 - 2019-01-07
+
+- adhere to sitemap standards
+
+## 5.2.7 - 2018-11-03
+
+- enforce priority value to be in between 0 and 1.
+
+## 5.2.6 - 2018-11-03
+
+- use absolute urls
+
 ## 5.2.5 - 2018-10-17
 
 - Remove unused dependency
